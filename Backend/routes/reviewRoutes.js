@@ -4,27 +4,25 @@ import Review from "../models/Review.js";
 
 const router = express.Router();
 
-// OpenRouter endpoint
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 /**
  * @route   POST /api/review
- * @desc    Generate AI-based code review
- * @access  Public
+ * @desc    Generate AI-based code review (linked to Firebase user)
+ * @access  Private
  */
 router.post("/", async (req, res) => {
-  const { filename, code } = req.body;
+  const { filename, code, userId, userEmail } = req.body;
 
-  if (!code) {
-    return res.status(400).json({ error: "Code is required." });
+  if (!code || !userId || !userEmail) {
+    return res.status(400).json({ error: "Missing required fields." });
   }
 
   try {
-    // 🔹 Send code to OpenRouter API
     const response = await axios.post(
       OPENROUTER_URL,
       {
-        model: "openai/gpt-oss-20b:free", // You can change this to another available model
+        model: "openai/gpt-oss-20b:free",
         messages: [
           {
             role: "system",
@@ -45,31 +43,22 @@ router.post("/", async (req, res) => {
       }
     );
 
-    // 🔹 Extract AI's markdown review
     const reviewText = response.data.choices[0].message.content;
+    const summary = "AI review completed successfully.";
+    const score = Math.round(Math.random() * 2 + 8); // random 8–10 score
 
-    // 🔹 Simple summary & rating logic
-    const summary = "AI review completed successfully. Code quality analyzed.";
-    const score = Math.round(Math.random() * 2 + 8); // Random score between 8–10
-
-    // 🔹 Save to MongoDB
+    // Save to MongoDB
     const newReview = await Review.create({
       filename: filename || "untitled.js",
       code,
       review: reviewText,
       summary,
       score,
+      userId,
+      userEmail,
     });
 
-    // 🔹 Return final response
-    res.json({
-      filename: newReview.filename,
-      code: newReview.code,
-      review: newReview.review,
-      summary: newReview.summary,
-      score: newReview.score,
-      createdAt: newReview.createdAt,
-    });
+    res.json(newReview);
   } catch (err) {
     console.error("Error in /api/review:", err.response?.data || err.message);
     res.status(500).json({
@@ -81,12 +70,17 @@ router.post("/", async (req, res) => {
 
 /**
  * @route   GET /api/review
- * @desc    Get all reviews
- * @access  Public
+ * @desc    Get all reviews for a specific user
+ * @access  Private
  */
 router.get("/", async (req, res) => {
   try {
-    const reviews = await Review.find().sort({ createdAt: -1 });
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ error: "userId is required" });
+    }
+
+    const reviews = await Review.find({ userId }).sort({ createdAt: -1 });
     res.json(reviews);
   } catch (err) {
     console.error("Error fetching reviews:", err.message);
@@ -96,8 +90,7 @@ router.get("/", async (req, res) => {
 
 /**
  * @route   GET /api/review/:id
- * @desc    Get single review by ID
- * @access  Public
+ * @desc    Get a single review by ID
  */
 router.get("/:id", async (req, res) => {
   try {
@@ -107,6 +100,19 @@ router.get("/:id", async (req, res) => {
   } catch (err) {
     console.error("Error fetching review:", err.message);
     res.status(500).json({ error: "Failed to fetch review." });
+  }
+});
+
+/**
+ * @route   DELETE /api/review/:id
+ * @desc    Delete a review by ID
+ */
+router.delete("/:id", async (req, res) => {
+  try {
+    await Review.findByIdAndDelete(req.params.id);
+    res.json({ message: "Review deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete review" });
   }
 });
 
