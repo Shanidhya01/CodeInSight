@@ -8,21 +8,40 @@ const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 /**
  * @route   POST /api/review
- * @desc    Generate AI-based code review (linked to Firebase user)
- * @access  Private
+ * @desc    Generate AI-based code review (used by website + VS Code extension)
+ * @access  Private (website) / Public (extension)
  */
 router.post("/", async (req, res) => {
   const { filename, code, userId, userEmail } = req.body;
 
-  if (!code || !userId || !userEmail) {
-    return res.status(400).json({ error: "Missing required fields." });
+  console.log("📥 Incoming request:", {
+    filename,
+    hasCode: !!code,
+    userId,
+    userEmail,
+  });
+
+  // Case 1️⃣: Request from website — enforce auth
+  if (!userId || !userEmail) {
+    console.log("🧩 No userId/userEmail provided — assuming VS Code extension");
   }
 
+  // Case 2️⃣: Common validation
+  if (!code) {
+    console.log("❌ Missing 'code' field!");
+    return res.status(400).json({ error: "Missing 'code' field." });
+  }
+
+  // Fallbacks for VS Code extension usage
+  const safeUserId = userId || "anonymous";
+  const safeUserEmail = userEmail || "anonymous@local.dev";
+
   try {
+    // ---- Call OpenRouter AI ----
     const response = await axios.post(
       OPENROUTER_URL,
       {
-        model: "openai/gpt-oss-20b:free",
+        model: "google/gemini-2.5-flash",
         messages: [
           {
             role: "system",
@@ -45,22 +64,23 @@ router.post("/", async (req, res) => {
 
     const reviewText = response.data.choices[0].message.content;
     const summary = "AI review completed successfully.";
-    const score = Math.round(Math.random() * 2 + 8); // random 8–10 score
+    const score = Math.round(Math.random() * 2 + 8); // 8–10 rating
 
-    // Save to MongoDB
+    // ---- Save to MongoDB ----
     const newReview = await Review.create({
       filename: filename || "untitled.js",
       code,
       review: reviewText,
       summary,
       score,
-      userId,
-      userEmail,
+      userId: safeUserId,
+      userEmail: safeUserEmail,
     });
 
+    console.log("✅ Review saved for:", safeUserEmail);
     res.json(newReview);
   } catch (err) {
-    console.error("Error in /api/review:", err.response?.data || err.message);
+    console.error("💥 Error in /api/review:", err.response?.data || err.message);
     res.status(500).json({
       error: "Failed to generate code review.",
       details: err.response?.data || err.message,
@@ -71,7 +91,7 @@ router.post("/", async (req, res) => {
 /**
  * @route   GET /api/review
  * @desc    Get all reviews for a specific user
- * @access  Private
+ * @access  Private (website)
  */
 router.get("/", async (req, res) => {
   try {
