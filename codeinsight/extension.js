@@ -21,7 +21,7 @@ function activate(context) {
 
     const config = vscode.workspace.getConfiguration("codeinsight");
     const backendUrl =
-      config.get("backendUrl") || "http://localhost:5000/api/review";
+      config.get("backendUrl") || "https://code-in-sight-backend.vercel.app/api/review";
 
     vscode.window.withProgress(
       {
