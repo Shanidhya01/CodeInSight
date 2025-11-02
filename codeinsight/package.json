@@ -1,22 +1,31 @@
 {
   "name": "codeinsight",
-  "displayName": "CodeInSight",
-  "publisher": "Shanidhya Kumar",
-  "description": "",
+  "displayName": "Shanidhya Code Reviewer",
+  "publisher": "ShanidhyaKumar",
+  "description": "AI-powered code review directly in your VS Code editor. Get instant feedback, suggestions, and best practices for your code.",
   "version": "0.0.1",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.105.0"
   },
   "categories": [
     "Other"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Shanidhya01/CodeInSight.git"
+  },
+  "homepage": "https://github.com/Shanidhya01/CodeInSight#readme",
+  "bugs": {
+    "url": "https://github.com/Shanidhya01/CodeInSight/issues"
+  },
   "activationEvents": [],
   "main": "./extension.js",
   "contributes": {
     "commands": [
       {
         "command": "codeinsight.codeinsight",
-        "title": "CodeInSight"
+        "title": "Shanidhya Code Reviewer"
       }
     ]
   },

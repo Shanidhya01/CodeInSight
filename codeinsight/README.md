@@ -1,65 +1,168 @@
-# codeinsight README
+# 🧠 CodeInsight VS Code Extension
 
-This is the README for your extension "codeinsight". After writing up a brief description, we recommend including the following sections.
+[![Version](https://img.shields.io/visual-studio-marketplace/v/shanidhya.codeinsight)](https://marketplace.visualstudio.com/items?itemName=shanidhya.codeinsight)
+[![Downloads](https://img.shields.io/visual-studio-marketplace/d/shanidhya.codeinsight)](https://marketplace.visualstudio.com/items?itemName=shanidhya.codeinsight)
+[![Rating](https://img.shields.io/visual-studio-marketplace/r/shanidhya.codeinsight)](https://marketplace.visualstudio.com/items?itemName=shanidhya.codeinsight)
 
-## Features
+AI-powered code review directly in your VS Code editor. Get instant feedback, suggestions, and best practices for your code without leaving your development environment.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## ✨ Features
 
-For example if there is an image subfolder under your extension project workspace:
+- **🤖 AI-Powered Analysis**: Advanced code review using state-of-the-art language models
+- **⚡ Instant Feedback**: Real-time analysis with improvement suggestions
+- **🔍 Multi-Language Support**: Works with JavaScript, Python, Java, C++, and more
+- **📝 Detailed Reports**: Comprehensive feedback with explanations and best practices
+- **🎯 Context-Aware**: Understands your code's purpose and provides relevant suggestions
+- **🔒 Secure**: Your code is processed securely without permanent storage
 
-\!\[feature X\]\(images/feature-x.png\)
+## 🚀 Quick Start
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+1. **Install the Extension**
+   - Open VS Code
+   - Go to Extensions (`Ctrl+Shift+X`)
+   - Search for "CodeInsight"
+   - Click Install
 
-## Requirements
+2. **Start Reviewing Code**
+   - Select code in your editor
+   - Right-click and choose "Review with CodeInsight"
+   - Or use the command palette (`Ctrl+Shift+P`) and search "CodeInsight: Review Selected Code"
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+3. **View Results**
+   - Review appears in a new panel
+   - Get suggestions for improvements
+   - Learn best practices and coding standards
 
-## Extension Settings
+## 📋 Commands
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+| Command | Description | Shortcut |
+|---------|-------------|----------|
+| `CodeInsight: Review Selected Code` | Analyze selected code | `Ctrl+Shift+R` |
+| `CodeInsight: Review Current File` | Analyze the entire current file | `Ctrl+Alt+R` |
+| `CodeInsight: Open Settings` | Configure extension settings | - |
 
-For example:
+## ⚙️ Configuration
 
-This extension contributes the following settings:
+Configure CodeInsight through VS Code settings:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+```json
+{
+  "codeinsight.apiUrl": "https://your-api-endpoint.com",
+  "codeinsight.autoReview": false,
+  "codeinsight.showInlineHints": true,
+  "codeinsight.reviewOnSave": false
+}
+```
 
-## Known Issues
+### Available Settings
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- **`codeinsight.apiUrl`**: Custom API endpoint for CodeInsight service
+- **`codeinsight.autoReview`**: Automatically review code as you type
+- **`codeinsight.showInlineHints`**: Show inline suggestions in editor
+- **`codeinsight.reviewOnSave`**: Trigger review when saving files
 
-## Release Notes
+## 🔧 Requirements
 
-Users appreciate release notes as you update your extension.
+- **VS Code**: Version 1.80.0 or higher
+- **Internet Connection**: Required for AI analysis
+- **Supported Languages**: JavaScript, TypeScript, Python, Java, C++, C#, Go, Rust, PHP, and more
 
-### 1.0.0
+## 📖 How It Works
 
-Initial release of ...
+1. **Code Selection**: Select the code you want to review or use the entire file
+2. **AI Analysis**: Your code is sent to our secure AI service for analysis
+3. **Smart Review**: Advanced language models analyze your code for:
+   - Syntax errors and potential bugs
+   - Performance optimizations
+   - Security vulnerabilities
+   - Code quality and maintainability
+   - Best practices and conventions
+4. **Actionable Feedback**: Receive detailed suggestions with explanations
 
-### 1.0.1
+## 🌟 Use Cases
 
-Fixed issue #.
+### For Individual Developers
+- **Code Quality**: Improve code quality before commits
+- **Learning**: Learn best practices and new techniques
+- **Debugging**: Identify potential issues early
+- **Performance**: Optimize code for better performance
 
-### 1.1.0
+### For Teams
+- **Code Reviews**: Streamline the review process
+- **Standards**: Maintain consistent coding standards
+- **Mentoring**: Help junior developers learn
+- **Quality Assurance**: Catch issues before production
 
-Added features X, Y, and Z.
+## 🔒 Privacy & Security
+
+- **No Permanent Storage**: Code is not stored after analysis
+- **Secure Transmission**: All data is encrypted in transit
+- **Anonymous Processing**: No personal information is collected
+- **GDPR Compliant**: Follows data protection regulations
+
+## 🐛 Troubleshooting
+
+### Extension Not Working?
+
+1. **Check Internet Connection**: Ensure you have a stable internet connection
+2. **Restart VS Code**: Sometimes a restart resolves issues
+3. **Check Settings**: Verify your configuration settings
+4. **Update Extension**: Make sure you have the latest version
+
+### Common Issues
+
+**Issue**: "No code selected"
+**Solution**: Select code in the editor before running the command
+
+**Issue**: "API connection failed"
+**Solution**: Check your internet connection and API settings
+
+**Issue**: "Analysis timeout"
+**Solution**: Try with smaller code selections
+
+## 📝 Changelog
+
+### v1.0.0
+- ✨ Initial release
+- 🤖 AI-powered code analysis
+- 📝 Detailed feedback reports
+- 🔧 Configurable settings
+
+### v1.0.1
+- 🐛 Bug fixes and performance improvements
+- 🔧 Enhanced error handling
+- 📖 Updated documentation
+
+## 🤝 Contributing
+
+We welcome contributions! Please feel free to submit issues, feature requests, and pull requests.
+
+### Development Setup
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Open in VS Code
+4. Press F5 to run in Extension Development Host
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🔗 Links
+
+- **🌐 Website**: [CodeInsight Official](https://codeinsight.dev)
+- **📖 Documentation**: [Full Documentation](https://docs.codeinsight.dev)
+- **🐛 Issues**: [Report Issues](https://github.com/Shanidhya01/codeinsight/issues)
+- **💬 Support**: [Get Support](mailto:support@codeinsight.dev)
+
+## 🙏 Acknowledgments
+
+- Thanks to the VS Code team for the excellent extension APIs
+- Powered by advanced AI language models
+- Built with ❤️ by [Shanidhya Kumar](https://github.com/Shanidhya01)
 
 ---
 
-## Working with Markdown
+**Made with 💙 by [Shanidhya Kumar](https://github.com/Shanidhya01)**
 
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+*Happy Coding! 🚀*
