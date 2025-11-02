@@ -36,8 +36,13 @@ router.post("/", async (req, res) => {
   const safeUserId = userId || "anonymous";
   const safeUserEmail = userEmail || "anonymous@local.dev";
 
+  // 1) Generate review text (OpenRouter or fallback)
+  let reviewText = null;
+  let usedFallback = false;
   try {
-    // ---- Call OpenRouter AI ----
+    if (!process.env.OPENROUTER_API_KEY) {
+      throw new Error("Missing OPENROUTER_API_KEY; using mock fallback");
+    }
     const response = await axios.post(
       OPENROUTER_URL,
       {
@@ -61,12 +66,20 @@ router.post("/", async (req, res) => {
         },
       }
     );
+    reviewText = response.data.choices?.[0]?.message?.content || "No response content";
+  } catch (err) {
+    usedFallback = true;
+    console.warn("⚠️ Using fallback review (no AI)", err.response?.status || err.message);
+    reviewText = `## CodeInsight Mock Review\n\n> Running in demo mode. AI provider unavailable.\n\n### Summary\n- Basic syntax appears valid.\n- Consider adding tests and linting.\n\n### Suggestions\n1. Add comments for complex logic.\n2. Validate inputs and handle errors.\n3. Prefer const/let over var; keep functions small.\n\n> This is a mock response generated without external AI.`;
+  }
 
-    const reviewText = response.data.choices[0].message.content;
-    const summary = "AI review completed successfully.";
-    const score = Math.round(Math.random() * 2 + 8); // 8–10 rating
+  const summary = usedFallback
+    ? "Mock review generated (AI unavailable)."
+    : "AI review completed successfully.";
+  const score = Math.round(Math.random() * 2 + 8); // 8–10 rating
 
-    // ---- Save to MongoDB ----
+  // 2) Try to persist; if DB fails, still return the review to the client
+  try {
     const newReview = await Review.create({
       filename: filename || "untitled.js",
       code,
@@ -76,14 +89,20 @@ router.post("/", async (req, res) => {
       userId: safeUserId,
       userEmail: safeUserEmail,
     });
-
     console.log("✅ Review saved for:", safeUserEmail);
-    res.json(newReview);
-  } catch (err) {
-    console.error("💥 Error in /api/review:", err.response?.data || err.message);
-    res.status(500).json({
-      error: "Failed to generate code review.",
-      details: err.response?.data || err.message,
+    return res.json(newReview);
+  } catch (dbErr) {
+    console.warn("⚠️ DB save failed; returning unsaved review:", dbErr.message);
+    return res.json({
+      _id: undefined,
+      filename: filename || "untitled.js",
+      code,
+      review: reviewText,
+      summary,
+      score,
+      userId: safeUserId,
+      userEmail: safeUserEmail,
+      createdAt: new Date().toISOString(),
     });
   }
 });
@@ -99,9 +118,13 @@ router.get("/", async (req, res) => {
     if (!userId) {
       return res.status(400).json({ error: "userId is required" });
     }
-
-    const reviews = await Review.find({ userId }).sort({ createdAt: -1 });
-    res.json(reviews);
+    try {
+      const reviews = await Review.find({ userId }).sort({ createdAt: -1 });
+      return res.json(reviews);
+    } catch (dbErr) {
+      console.warn("⚠️ DB fetch failed; returning empty list:", dbErr.message);
+      return res.json([]);
+    }
   } catch (err) {
     console.error("Error fetching reviews:", err.message);
     res.status(500).json({ error: "Failed to fetch reviews." });

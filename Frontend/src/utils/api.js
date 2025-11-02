@@ -1,9 +1,22 @@
 import axios from "axios";
 
-// Create API instance
-const API = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api`,
-});
+// Resolve API base URL robustly for local and deployed envs
+function resolveBaseUrl() {
+  const envUrl = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+  if (envUrl) return envUrl;
+  // Optional runtime override (can be injected via <script> on host)
+  if (typeof window !== "undefined" && window.__API_URL__) {
+    return String(window.__API_URL__).replace(/\/$/, "");
+  }
+  // Fallbacks: in production, try same origin; in dev, localhost:5000
+  if (import.meta.env.PROD && typeof window !== "undefined") {
+    return window.location.origin;
+  }
+  return "http://localhost:5000";
+}
+
+const API_BASE = resolveBaseUrl();
+const API = axios.create({ baseURL: `${API_BASE}/api` });
 
 // ✅ Attach Firebase user token (for protected routes)
 API.interceptors.request.use(async (config) => {

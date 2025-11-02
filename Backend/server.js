@@ -8,10 +8,31 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: ["https://code-in-sight.vercel.app/", "http://localhost:5173"],
-  credentials: true
-}));
+// Allow multiple origins, configurable via env var ALLOWED_ORIGINS (comma-separated)
+const defaultOrigins = [
+  "http://localhost:5173",
+  "https://code-in-sight.vercel.app",
+];
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow non-browser requests or same-origin
+      if (!origin) return callback(null, true);
+      const cleanOrigin = origin.replace(/\/$/, "");
+      const list = allowedOrigins.length ? allowedOrigins : defaultOrigins;
+      if (list.includes(cleanOrigin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Routes
